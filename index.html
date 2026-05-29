@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>時光快門：寂寞洋樓的八個秘密</title>
+    <style>
+        :root {
+            --primary-bg: #2c241b;
+            --paper-bg: #fdf6e3;
+            --text-dark: #3e2723;
+            --text-light: #e0d4c3;
+            --accent-color: #8d6e63;
+            --button-color: #5d4037;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, 'LiHei Pro', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px dashed var(--accent-color);
+            padding-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #d7ccc8;
+            margin: 0 0 10px 0;
+            letter-spacing: 2px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #4e342e;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #bcaaa4;
+            width: 0%;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .card {
+            background-color: var(--paper-bg);
+            color: var(--text-dark);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .stage-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 0;
+            color: #4e342e;
+            border-left: 5px solid var(--accent-color);
+            padding-left: 10px;
+        }
+
+        .target-box {
+            background-color: #efebe0;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 15px 0;
+            text-align: center;
+            color: #5d4037;
+        }
+
+        .clue-text {
+            line-height: 1.6;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        .camera-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--button-color);
+            color: white;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: background-color 0.3s;
+        }
+
+        .camera-btn:hover {
+            background-color: #4e342e;
+        }
+
+        /* 隱藏真實的檔案上傳輸入框 */
+        input[type="file"] {
+            display: none;
+        }
+
+        .story-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .story-content {
+            background-color: var(--paper-bg);
+            color: var(--text-dark);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 100%;
+            text-align: left;
+            position: relative;
+        }
+
+        .story-title {
+            color: #d32f2f;
+            margin-top: 0;
+            font-size: 22px;
+            border-bottom: 2px solid #d32f2f;
+            padding-bottom: 10px;
+        }
+
+        .story-text {
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        .next-btn {
+            margin-top: 20px;
+            background-color: #2e7d32;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            color: var(--paper-bg);
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .end-screen {
+            display: none;
+            text-align: center;
+            background-color: var(--paper-bg);
+            color: var(--text-dark);
+            padding: 40px 20px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>寂寞洋樓的八個秘密</h1>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+        <div id="progress-text">關卡 1 / 8</div>
+    </header>
+
+    <div class="card" id="game-card">
+        <h2 class="stage-title" id="stage-title">載入中...</h2>
+        <div class="target-box">
+            目標：<span id="target-item">載入中...</span>
+        </div>
+        <div class="clue-text" id="clue-text">
+            載入中...
+        </div>
+        
+        <!-- 點擊按鈕觸發隱藏的 input 呼叫相機 -->
+        <label class="camera-btn" for="camera-input">
+            📸 開啟相機拍攝解鎖
+        </label>
+        ><input type="file" id="camera-input" accept="image/*">
+        
+        <div class="loader" id="loader">
+            <div class="spinner"></div>
+            照片分析中... 歷史記憶解鎖中...
+        </div>
+    </div>
+
+    <!-- 結局畫面 -->
+    <div class="end-screen" id="end-screen">
+        <h2 style="color: #d32f2f;">🎉 挑戰完成！</h2>
+        <p style="line-height: 1.6; font-size: 16px;">
+            恭喜你們找齊了寂寞洋樓的八個秘密！<br><br>
+            從百年前的花生油香、戰火無情的痕跡，到如今兩代父子共同經營的咖啡館。這棟建築不只是古蹟，更是充滿溫度的生命記憶。<br><br>
+            請帶著你們拍攝的照片，回到關主（老師）身邊領取最後的獎勵吧！
+        </p>
+    </div>
+</div>
+
+<!-- 故事解鎖彈跳視窗 -->
+<div class="story-modal" id="story-modal">
+    <div class="story-content">
+        <h3 class="story-title">🔓 歷史記憶已解鎖</h3>
+        <div class="story-text" id="story-text">
+            故事內容...
+        </div>
+        <button class="camera-btn next-btn" onclick="nextStage()">前往下一關 ➔</button>
+    </div>
+</div>
+
+<script>
+    // 關卡資料設定
+    const stages = [
+        {
+            title: "關卡 1：非典型的起點",
+            target: "從未破裂的陶製大油缸",
+            clue: "「金門的洋樓大多是前人『落番』（下南洋）賺外匯回來蓋的，但這棟洋樓的資金來源卻充滿了濃濃的『在地金黃色』。請找出那個見證家族發跡、用大陸陶胚製作且從未破裂的巨大容器，拍下它的身影！」",
+            story: "這棟洋樓建於 1921 年，是老闆的阿公與伯公靠著在金門種花生、開油車榨花生油賺錢蓋起來的。這顆大油缸以前放在店鋪裡，客人會提著罐子來打油，它見證了這棟建築最繁華的商貿起點。"
+        },
+        {
+            title: "關卡 2：消失的左右護法",
+            target: "大門左右兩側的新建牆面",
+            clue: "「建築也有屬於自己的遺憾。洋樓正門的左右兩側，原本有兩座被稱為『迴向』的小房子。在近年的修復中，它們變成了截然不同的樣貌。請站在大門口，拍下這兩面『重生的牆面』。」",
+            story: "這兩側本來是傳統的「迴向」建築。在民國 93 年的修復工程中，因為種種限制與施工考量，原本的牆面被拆除換成了新式建材。雖然失去了原貌有些可惜，但也留下了現代修復與歷史保存之間的深刻反思。"
+        },
+        {
+            title: "關卡 3：紅磚裡的混血密碼",
+            target: "洋樓外觀的紅磚結構或閩南式特徵",
+            clue: "「水頭聚落的洋樓常帶有東南亞色彩與天使圖騰，但這棟洋樓卻流著『閩南惠安』的純粹血液。請在建築外部，尋找並拍下一處最能體現『紅磚式閩南建築』的特色角落。」",
+            story: "當年特別請來閩南惠安縣的師傅建造，所有紅磚石材都來自對岸。雖然是「洋樓」的格局，骨子裡卻保留了傳統閩南建築的工法與韻味，是金門洋樓中獨樹一格的存在。"
+        },
+        {
+            title: "關卡 4：頂樓的烽火印記",
+            target: "二樓頂部或欄杆處的修補痕跡",
+            clue: "「無情的砲火曾在這棟美麗的建築上留下傷痕。請抬起頭仔細觀察，尋找二樓頂部或欄杆處，有沒有哪裡看起來『跟原本設計不一樣、是後來才修補過』的痕跡？拍下那個烽火印記。」",
+            story: "古寧頭大戰與八二三砲戰期間，這裡曾是國軍高階將領的指揮所。二樓頂端的欄杆曾被砲彈直接擊中，現在看到的突兀結構，都是戰後為了修補當年砲擊造成的損壞而留下的痕跡。"
+        },
+        {
+            title: "關卡 5：指揮官的地下堡壘",
+            target: "洋樓一樓的地面（想像地下的空間）",
+            clue: "「古寧頭大戰時，高魁元將軍的後方司令官就駐守於此。傳說這棟洋樓的下方是『中空』的，甚至藏著能維持生命的秘密水源！請拍下一張洋樓內部的『地面』，想像腳下曾經隱藏的戰時生機。」",
+            story: "洋樓的正下方其實是相通的地下坑道，裡面甚至有一口水井。當共軍砲擊時，司令官與軍隊可以直接躲入地下，靠著一口井和一包米，就能在坑道裡度過漫長且危險的戰時歲月。"
+        },
+        {
+            title: "關卡 6：軍樂隊的地下音樂廳",
+            target: "外面的防空洞入口",
+            clue: "「戰爭時期，有些聲音被藏在了地底。在建築外圍，有一個後來才興建的狹窄避難空間，這裡曾經是國軍軍樂隊躲避砲火、練習薩克斯風的秘密基地。找到它，並拍下這個『地下音樂廳』！」",
+            story: "這是古寧頭戰役後才興建的新式防空洞。因為當時軍樂隊沒有安全的地方可以練習，只好躲進這個防空洞裡吹奏樂器。充滿肅殺之氣的防空洞，曾迴盪著薩克斯風的樂音，是戰地歲月中十分奇特的對比。"
+        },
+        {
+            title: "關卡 7：轉動歷史的巨石",
+            target: "外面的磨油工具（石磨）",
+            clue: "「在成為充滿咖啡香的空間之前，這裡曾日夜瀰漫著花生的香氣。請在戶外的工作室區域，尋找那個長得很像磨豆漿工具、曾經不斷轉動壓碎花生的『歷史巨石』，拍下它的樣貌！」",
+            story: "這個石磨就是以前榨油的「油車」的一部分。工人會將花生曬乾、去殼，放入石磨中輾碎，再透過過濾的方式將珍貴的花生油滴入大油缸中，是整棟建築經濟命脈的運作核心。"
+        },
+        {
+            title: "關卡 8：兩代的專屬視角",
+            target: "一樓最後面的一個座位",
+            clue: "「老闆曾是四處征戰的運動員，因傷退役後，為了幫兒子圓夢才踏入咖啡的世界。請在一樓尋找『最後面』的那個座位。這不僅是老闆最常坐的地方，也是兒子當初畫咖啡廳設計圖的專屬位置。拍下這個充滿親情的座位！」",
+            story: "這間咖啡廳的名字「寂寞寂寞somebody」，除了帶有偏鄉位置的諧音幽默，更承載了父子之間的深厚情感。老闆為了兒子的開店夢，特地去上了社區大學的咖啡課程。這個角落的座位，見證了老建築轉型的新生命，也延續了家族在此地的新故事。"
+        }
+    ];
+
+    let currentStageIndex = 0;
+
+    // DOM 元素
+    const titleEl = document.getElementById('stage-title');
+    const targetEl = document.getElementById('target-item');
+    const clueEl = document.getElementById('clue-text');
+    const progressFill = document.getElementById('progress');
+    const progressText = document.getElementById('progress-text');
+    const cameraInput = document.getElementById('camera-input');
+    const loader = document.getElementById('loader');
+    const storyModal = document.getElementById('story-modal');
+    const storyText = document.getElementById('story-text');
+    const gameCard = document.getElementById('game-card');
+    const endScreen = document.getElementById('end-screen');
+    const cameraLabel = document.querySelector('.camera-btn');
+
+    // 渲染當前關卡
+    function renderStage() {
+        const stage = stages[currentStageIndex];
+        titleEl.textContent = stage.title;
+        targetEl.textContent = stage.target;
+        clueEl.textContent = stage.clue;
+        
+        // 更新進度條
+        const progressPercentage = ((currentStageIndex) / stages.length) * 100;
+        progressFill.style.width = progressPercentage + '%';
+        progressText.textContent = `關卡 ${currentStageIndex + 1} / ${stages.length}`;
+        
+        // 重置 UI
+        cameraInput.value = ''; // 清除上次的檔案
+        cameraLabel.style.display = 'block';
+        loader.style.display = 'none';
+    }
+
+    // 監聽照片上傳/拍攝事件
+    cameraInput.addEventListener('change', function(e) {
+        if (e.target.files && e.target.files.length > 0) {
+            // 模擬分析照片的延遲效果 (1.5秒)
+            cameraLabel.style.display = 'none';
+            loader.style.display = 'block';
+            
+            setTimeout(() => {
+                showStory();
+            }, 1500);
+        }
+    });
+
+    // 顯示故事彈跳視窗
+    function showStory() {
+        storyText.textContent = stages[currentStageIndex].story;
+        storyModal.style.display = 'flex';
+    }
+
+    // 進入下一關
+    function nextStage() {
+        storyModal.style.display = 'none';
+        currentStageIndex++;
+        
+        if (currentStageIndex < stages.length) {
+            renderStage();
+        } else {
+            // 遊戲結束
+            progressFill.style.width = '100%';
+            progressText.textContent = `完成！`;
+            gameCard.style.display = 'none';
+            endScreen.style.display = 'block';
+        }
+    }
+
+    // 初始化遊戲
+    window.onload = renderStage;
+
+</script>
+</body>
+</html>
